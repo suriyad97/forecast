@@ -70,10 +70,4 @@ if raw_df is not None:
 else:
     st.info("Upload a CSV file to unlock the overview dashboard.")
 
-st.markdown("---")
-st.write("Quick navigation:")
-st.page_link("pages/1_Ingestion_and_EDA.py", label="Ingestion & EDA")
-st.page_link("pages/2_Feature_Engineering.py", label="Feature Engineering")
-st.page_link("pages/3_🤖_Models_and_Metrics.py", label="Models & Metrics")
-st.page_link("pages/4_🔮_Forecast_Explorer.py", label="Forecast Explorer")
 
