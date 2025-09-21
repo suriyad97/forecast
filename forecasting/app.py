@@ -15,8 +15,7 @@ if "train_split_ratio" not in st.session_state:
     st.session_state["train_split_ratio"] = 0.8
     st.session_state["train_split_label"] = "80% Train / 20% Test"
 
-uploaded
- = st.file_uploader(
+uploaded = st.file_uploader(
     "Upload CSV (policy-level or monthly aggregated)",
     type=["csv"],
     key="landing_uploader",
@@ -77,3 +76,4 @@ st.page_link("pages/1_Ingestion_and_EDA.py", label="Ingestion & EDA")
 st.page_link("pages/2_Feature_Engineering.py", label="Feature Engineering")
 st.page_link("pages/3_🤖_Models_and_Metrics.py", label="Models & Metrics")
 st.page_link("pages/4_🔮_Forecast_Explorer.py", label="Forecast Explorer")
+

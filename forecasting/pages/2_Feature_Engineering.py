@@ -13,8 +13,7 @@ if "train_split_ratio" not in st.session_state:
     st.session_state["train_split_ratio"] = 0.8
     st.session_state["train_split_label"] = "80% Train / 20% Test"
 
-raw_df
- = st.session_state["raw_df"].copy()
+raw_df = st.session_state["raw_df"].copy()
 monthly = st.session_state["monthly_df"].copy().sort_index().asfreq("MS")
 st.write("Base series length:", len(monthly))
 split_options = {
@@ -22,6 +21,7 @@ split_options = {
     "75% Train / 25% Test": 0.75,
     "80% Train / 20% Test": 0.80,
     "85% Train / 15% Test": 0.85,
+    "90% Train / 10% Test": 0.90,
 }
 default_split_label = st.session_state.get("train_split_label", "80% Train / 20% Test")
 split_label = st.selectbox(
@@ -137,28 +137,29 @@ else:
     st.info("No categorical columns detected in the monthly aggregation.")
 
 # ----- Build feature dataset -----
-fe = make_lags(monthly, lags=tuple(lags) if lags else (1, 2, 3, 6, 12))
-fe = add_time_features(fe)
-fe = make_rolling(fe, windows=tuple(rolls) if rolls else (3, 6))
+lagged = make_lags(monthly, lags=tuple(lags) if lags else (1, 2, 3, 6, 12))
+lagged = add_time_features(lagged)
+lagged = make_rolling(lagged, windows=tuple(rolls) if rolls else (3, 6))
+lagged = lagged.replace([float('inf'), float('-inf')], pd.NA).sort_index()
+
+if len(lagged) >= 2:
+    split_idx = max(1, int(len(lagged) * split_ratio))
+    if split_idx >= len(lagged):
+        split_idx = len(lagged) - 1
+    fe_train = lagged.iloc[:split_idx]
+    fe_test = lagged.iloc[split_idx:]
+else:
+    fe_train = lagged
+    fe_test = lagged.iloc[0:0]
 
 if encoding_plan:
-    fe = encode_categoricals(fe, encoding_plan)
+    fe_train = encode_categoricals(fe_train, encoding_plan)
+    fe_test = encode_categoricals(fe_test, encoding_plan)
 
-fe = fe.replace([float("inf"), float("-inf")], pd.NA)
-fe = fe.sort_index()
+fe = pd.concat([fe_train, fe_test]).sort_index()
 
-if len(fe) >= 2:
-    split_idx = max(1, int(len(fe) * split_ratio))
-    if split_idx >= len(fe):
-        split_idx = len(fe) - 1
-    fe_train = fe.iloc[:split_idx]
-    fe_test = fe.iloc[split_idx:]
-else:
-    fe_train = fe
-    fe_test = fe.iloc[0:0]
-
-st.session_state["features_train_df"] = fe_train
-st.session_state["features_test_df"] = fe_test
+st.session_state['features_train_df'] = fe_train
+st.session_state['features_test_df'] = fe_test
 
 train_start = fe_train.index.min().strftime('%Y-%m') if len(fe_train) else '-'
 train_end = fe_train.index.max().strftime('%Y-%m') if len(fe_train) else '-'
@@ -168,10 +169,12 @@ test_end = fe_test.index.max().strftime('%Y-%m') if len(fe_test) else '-'
 st.markdown(f"**Train window:** {train_start} -> {train_end} (n={len(fe_train)})")
 st.markdown(f"**Test window:** {test_start} -> {test_end} (n={len(fe_test)})")
 
-st.subheader("Engineered Features (head)")
+st.subheader('Engineered Features (head)')
 st.dataframe(fe.head(15))
 
 csv = fe.to_csv(index=True).encode()
-st.download_button("Download features CSV", data=csv, file_name="features_dataset.csv", mime="text/csv")
+st.download_button('Download features CSV', data=csv, file_name='features_dataset.csv', mime='text/csv')
 
-st.session_state["features_df"] = fe
+st.session_state['features_df'] = fe
+
+

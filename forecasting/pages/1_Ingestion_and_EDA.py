@@ -8,7 +8,7 @@ st.title("Ingestion & EDA")
 if "train_split_ratio" not in st.session_state:
     st.session_state["train_split_ratio"] = 0.8
     st.session_state["train_split_label"] = "80% Train / 20% Test"
-\nuploaded = st.file_uploader("Upload CSV (policy-level or monthly aggregated)", type=["csv"], key="ingestion_uploader")
+uploaded = st.file_uploader("Upload CSV (policy-level or monthly aggregated)", type=["csv"], key="ingestion_uploader")
 
 if uploaded is not None:
     try:
@@ -67,4 +67,5 @@ if raw_df is not None:
     render_descriptive_analysis(raw_df, monthly)
 else:
     st.info("Upload a CSV file to begin exploring your data.")
+
 
