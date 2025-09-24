@@ -17,7 +17,7 @@ from utils.ml_models import get_ml_model, make_lag_matrix, iterative_forecast
 st.title("Forecast Explorer - Refit on Full Data & Predict Future")
 
 if "monthly_df" not in st.session_state:
-    st.warning("Please complete Ingestion & EDA first.")
+    st.warning("Please upload data on the landing page first.")
     st.stop()
 
 EXOG_MODELS = {"SARIMAX_exog", "XGBoost", "LightGBM", "RandomForest"}
@@ -170,3 +170,4 @@ st.download_button(
     file_name="future_forecast.csv",
     mime="text/csv",
 )
+

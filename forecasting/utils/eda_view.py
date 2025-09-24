@@ -572,7 +572,7 @@ def render_sales_overview(raw: pd.DataFrame, monthly: pd.DataFrame, years=None, 
     c2.metric("Avg Monthly Premium", f"{avg_monthly:,.0f}")
     delta_label = f"{change_pct:+.1f}%" if not np.isnan(change_pct) else "-"
     c3.metric("Latest Month Premium", f"{latest_value:,.0f}", delta_label)
-    st.caption("Figures reflect the filtered dataset. Jump to Ingestion & EDA for deeper diagnostics.")
+    st.caption("Figures reflect the filtered dataset. Visit the Feature Engineering page for deeper diagnostics.")
     st.markdown("**Premium Trend**")
     _plot_series(premium_series, "Premium Trend")
     charts = []
@@ -641,3 +641,4 @@ def render_sales_overview(raw: pd.DataFrame, monthly: pd.DataFrame, years=None, 
     st.subheader("Recommendations")
     for item in recommendations:
         st.markdown(f"- {item}")
+
